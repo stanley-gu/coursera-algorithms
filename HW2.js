@@ -17,7 +17,9 @@ console.log('Loaded in ' + ints.length + ' items in an array')
 // Quick Sort
 var quicksort = function(array, comparisons, choosePivot) {
     if (array.length <= 1) {
-        return {array: array, comparisons: comparisons};
+        var sortedArray = array;
+        var numComparisons = comparisons;
+        return {array: sortedArray, comparisons: numComparisons};
     } else {
         // increment count
         comparisons += array.length - 1;
@@ -26,18 +28,17 @@ var quicksort = function(array, comparisons, choosePivot) {
         var pivot = array[p];
         // partition
         var part = partition(array, p);
-        array = part.array;
-        p = part.p; // location of pivot after partitioning
+        //array = part.array;
+        //p = part.p; // location of pivot after partitioning
         // sort left
-        var left = quicksort(array.slice(0,p), 0, choosePivot);
+        var left = quicksort(part.array.slice(0,part.p), 0, choosePivot);
         comparisons += left.comparisons;
         // sort right
-        var right = quicksort(array.slice(p+1,array.length), 0, choosePivot);
+        var right = quicksort(part.array.slice(part.p+1, part.array.length), 0, choosePivot);
         comparisons += right.comparisons;
         // recombine
-        //return {array: leftArray.concat(array[p], rightArray), comparisons: comparisons};
         var combined = [];
-        combined = combined.concat(left.array, array[p], right.array)
+        combined = combined.concat(left.array, part.array[part.p], right.array)
         return {array: combined, comparisons: comparisons};
     }
 }
@@ -66,26 +67,27 @@ var chooseMedianPivot = function(array) {
 var partition = function(array, p){
     var pivot = array[p];
     var length = array.length;
-    // move pivot to the front
-    array[p] = array[0];
-    array[0] = pivot;
+    // make a copy and move pivot to the front
+    var array2 = array.splice();
+    array2[p] = array2[0];
+    array2[0] = pivot;
     // partition the array
-    //console.log('array before partitioning: ' + array)
     var i = 1;
     for (var j = 1; j < length; j++){
         //console.log('i='+i+', j='+j)
-        if (array[j] < pivot) {
-            var temp = array[j];
-            array[j] = array[i];
-            array[i] = temp;
+        if (array2[j] < pivot) {
+            var temp = array2[j];
+            array2[j] = array2[i];
+            array2[i] = temp;
             i++;
         }
     }
     //console.log('array after partitioning: ' + array)
     // swap pivot
-    array[0] = array[i-1];
-    array[i-1] = pivot;
-    return {array: array, p: i-1};
+    array2[0] = array2[i-1];
+    array2[i-1] = pivot;
+    var answer = {array: array2, p: i-1}
+    return answer;
 };
 
 debugger;
@@ -93,3 +95,11 @@ console.log(quicksort(ints, 0, chooseFirstPivot).comparisons)
 console.log(quicksort(ints, 0, chooseLastPivot).comparisons)
 console.log(quicksort(ints, 0, chooseMedianPivot).comparisons)
 
+var old = fs.readFileSync('IntegerArray.txt').toString().split("\r\n").slice(0,10000);
+console.log(quicksort(old, 0, chooseFirstPivot).comparisons)
+console.log(quicksort(old, 0, chooseFirstPivot).comparisons)
+
+var a = [3,2,1];
+console.log(a);
+partition(a,0)
+console.log(a)
