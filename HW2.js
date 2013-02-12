@@ -20,10 +20,13 @@ var a = [2, 1, 3];
 
 // Quick Sort
 var quicksort = function(array, comparisons) {
-    comparisons += array.length | 0;
     if (array.length <= 1) {
+        console.log('base case array = '+array)
         return {array: array, comparisons: comparisons};
     } else {
+        console.log('+++++++')
+        // increment count
+        comparisons += array.length - 1;
         // choose pivot
         var p = choosePivot(array);
         var pivot = array[p];
@@ -31,16 +34,28 @@ var quicksort = function(array, comparisons) {
         part = partition(array, p);
         array = part.array;
         p = part.p; // location of pivot after partitioning
+        console.log('partitioned array: '+ array)
+
         // sort left
-        var left = quicksort(array.slice(0,p), comparisons);
-        leftArray = left.array;
+        console.log('sorting left: ' + array.slice(0,p))
+        var left = quicksort(array.slice(0,p), 0);
         comparisons += left.comparisons;
         // sort right
-        var right = quicksort(array.slice(p+1,array.length), comparisons);
-        rightArray = right.array;
+        console.log('sorting right: ' + array.slice(p+1,array.length))
+        var right = quicksort(array.slice(p+1,array.length), 0);
         comparisons += right.comparisons;
         // recombine
-        return {array: leftArray.concat(array[p], rightArray), comparisons: comparisons};
+        //return {array: leftArray.concat(array[p], rightArray), comparisons: comparisons};
+        var combined = [];
+        combined = combined.concat(left.array, array[p], right.array)
+        console.log('combining now, comparisons: ' + comparisons)
+        console.log('left: ' + left.array)
+        console.log('mid: ' + array[p])
+        console.log('right: ' + right.array)
+        console.log('combined: ' + combined)
+        console.log('=======')
+
+        return {array: combined, comparisons: comparisons};
     }
 }
 
@@ -71,11 +86,11 @@ var partition = function(array, p){
     array[0] = array[i-1];
     array[i-1] = pivot;
     return {array: array, p: i-1};
-}
+};
 
 var testPartition = [3,4,5,1,2];
-//var t = partition(testPartition, 0);
-//console.log(t.array + ' with pivot at ' + t.p);
-
+var t = partition(testPartition, 0);
+console.log(t.array + ' with pivot at ' + t.p);
+var testPartition = [1,3,2]
+console.log('test array is: ' + testPartition);
 console.log(quicksort(testPartition,0));
-console.log(quicksort(testPartition.concat(testPartition), 0));
