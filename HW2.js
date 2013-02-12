@@ -11,56 +11,56 @@
 //
 var fs = require('fs');
 var array = fs.readFileSync('QuickSort.txt').toString().split("\r\n");
-var ints = array.splice(0,10000);
+var ints = array.slice(0,10000);
 console.log('Loaded in ' + ints.length + ' items in an array')
 
-
-// test array
-var a = [2, 1, 3];
-
 // Quick Sort
-var quicksort = function(array, comparisons) {
+var quicksort = function(array, comparisons, choosePivot) {
     if (array.length <= 1) {
-        console.log('base case array = '+array)
         return {array: array, comparisons: comparisons};
     } else {
-        console.log('+++++++')
         // increment count
         comparisons += array.length - 1;
         // choose pivot
         var p = choosePivot(array);
         var pivot = array[p];
         // partition
-        part = partition(array, p);
+        var part = partition(array, p);
         array = part.array;
         p = part.p; // location of pivot after partitioning
-        console.log('partitioned array: '+ array)
-
         // sort left
-        console.log('sorting left: ' + array.slice(0,p))
-        var left = quicksort(array.slice(0,p), 0);
+        var left = quicksort(array.slice(0,p), 0, choosePivot);
         comparisons += left.comparisons;
         // sort right
-        console.log('sorting right: ' + array.slice(p+1,array.length))
-        var right = quicksort(array.slice(p+1,array.length), 0);
+        var right = quicksort(array.slice(p+1,array.length), 0, choosePivot);
         comparisons += right.comparisons;
         // recombine
         //return {array: leftArray.concat(array[p], rightArray), comparisons: comparisons};
         var combined = [];
         combined = combined.concat(left.array, array[p], right.array)
-        console.log('combining now, comparisons: ' + comparisons)
-        console.log('left: ' + left.array)
-        console.log('mid: ' + array[p])
-        console.log('right: ' + right.array)
-        console.log('combined: ' + combined)
-        console.log('=======')
-
         return {array: combined, comparisons: comparisons};
     }
 }
 
-var choosePivot = function(array) {
+var chooseFirstPivot = function(array) {
     return 0;
+}
+
+var chooseLastPivot = function(array) {
+    return array.length-1;
+}
+
+var chooseMedianPivot = function(array) {
+    var first = array[0];
+    var middle = array[Math.floor(array.length/2)];
+    var last = array[array.length-1];
+    if ((first < middle) && (last > middle)) {
+        return Math.floor(array.length/2);
+    } else if ((middle < first) && (first < last)) {
+        return 0;
+    } else {
+        return array.length-1;
+    }
 }
 
 var partition = function(array, p){
@@ -88,9 +88,8 @@ var partition = function(array, p){
     return {array: array, p: i-1};
 };
 
-var testPartition = [3,4,5,1,2];
-var t = partition(testPartition, 0);
-console.log(t.array + ' with pivot at ' + t.p);
-var testPartition = [1,3,2]
-console.log('test array is: ' + testPartition);
-console.log(quicksort(testPartition,0));
+debugger;
+console.log(quicksort(ints, 0, chooseFirstPivot).comparisons)
+console.log(quicksort(ints, 0, chooseLastPivot).comparisons)
+console.log(quicksort(ints, 0, chooseMedianPivot).comparisons)
+
