@@ -12,94 +12,90 @@
 var fs = require('fs');
 var array = fs.readFileSync('QuickSort.txt').toString().split("\r\n");
 var ints = array.slice(0,10000);
-console.log('Loaded in ' + ints.length + ' items in an array')
+ints.forEach(function(element, index, array) {
+    array[index] = parseInt(element, 10);
+});
+
+console.log('Loaded in ' + ints.length + ' items in an array');
+
+var oldArray = fs.readFileSync('IntegerArray.txt').toString().split("\r\n").slice(0,100000);
+oldArray.forEach(function(element, index, array) {
+    array[index] = parseInt(element, 10);
+});
+
 
 // Quick Sort
-var quicksort = function(array, comparisons, choosePivot) {
-    if (array.length <= 1) {
-        var sortedArray = array;
-        var numComparisons = comparisons;
-        return {array: sortedArray, comparisons: numComparisons};
-    } else {
-        // increment count
-        comparisons += array.length - 1;
-        // choose pivot
-        var p = choosePivot(array);
-        var pivot = array[p];
-        // partition
-        var part = partition(array, p);
-        //array = part.array;
-        //p = part.p; // location of pivot after partitioning
-        // sort left
-        var left = quicksort(part.array.slice(0,part.p), 0, choosePivot);
-        comparisons += left.comparisons;
-        // sort right
-        var right = quicksort(part.array.slice(part.p+1, part.array.length), 0, choosePivot);
-        comparisons += right.comparisons;
-        // recombine
-        var combined = [];
-        combined = combined.concat(left.array, part.array[part.p], right.array)
-        return {array: combined, comparisons: comparisons};
-    }
-}
-
-var chooseFirstPivot = function(array) {
-    return 0;
-}
-
-var chooseLastPivot = function(array) {
-    return array.length-1;
-}
-
-var chooseMedianPivot = function(array) {
-    var first = array[0];
-    var middle = array[Math.floor(array.length/2)];
-    var last = array[array.length-1];
-    if ((first < middle) && (last > middle)) {
-        return Math.floor(array.length/2);
-    } else if ((middle < first) && (first < last)) {
+var quicksort = function(array, start, end, choosePivot) {
+    //base case
+    if ((end - start) <= 0) {
         return 0;
     } else {
-        return array.length-1;
+        //recursive case
+        // choose pivot
+        var pivot = choosePivot(array, start, end);
+        // partition array
+        pivot = partition(array, start, end, pivot);
+        // sort left half
+        var leftCount = quicksort(array, start, pivot-1, choosePivot);
+        // sort right half
+        var rightCount = quicksort(array, pivot+1, end, choosePivot);
+        var counts = end - start + leftCount + rightCount;
+        return counts;
     }
-}
+};
+var chooseFirstPivot = function(array, start, end) {
+    return start;
+};
+var chooseLastPivot = function(array, start, end) {
+    return end;
+};
+var chooseMedianPivot = function(array, start, end) {
+    var first = array[start];
+    var mid = Math.floor((end-start)/2) + start;
+    var middle = array[mid];
+    var last = array[end];
+    var medArray = [first, middle, last];
+    var medStruct = {};
+    medStruct[first] = start;
+    medStruct[middle] = mid;
+    medStruct[last] = end;
+    quicksort(medArray, 0, 2, chooseFirstPivot);
+    return medStruct[medArray[1]];
+};
 
-var partition = function(array, p){
-    var pivot = array[p];
-    var length = array.length;
-    // make a copy and move pivot to the front
-    var array2 = array.splice();
-    array2[p] = array2[0];
-    array2[0] = pivot;
-    // partition the array
-    var i = 1;
-    for (var j = 1; j < length; j++){
-        //console.log('i='+i+', j='+j)
-        if (array2[j] < pivot) {
-            var temp = array2[j];
-            array2[j] = array2[i];
-            array2[i] = temp;
+var partition = function(array, start, end, pivot){
+    // exchange first item with pivot
+    var p = array[pivot];
+    array[pivot] = array[start];
+    array[start] = p;
+    // begin loop
+    var i = start+1;
+    for (var j = start+1; j <= end; j++) {
+        if (array[j] < p) {
+            var temp = array[j];
+            array[j] = array[i];
+            array[i] = temp;
             i++;
         }
     }
-    //console.log('array after partitioning: ' + array)
-    // swap pivot
-    array2[0] = array2[i-1];
-    array2[i-1] = pivot;
-    var answer = {array: array2, p: i-1}
-    return answer;
+    //swap pivot
+    array[start] = array[i-1];
+    array[i-1] = p;
+    //return pivot position
+    return i-1;
 };
 
-debugger;
-console.log(quicksort(ints, 0, chooseFirstPivot).comparisons)
-console.log(quicksort(ints, 0, chooseLastPivot).comparisons)
-console.log(quicksort(ints, 0, chooseMedianPivot).comparisons)
+test = oldArray.slice();
+count = quicksort(test.slice(), 0, test.length-1, chooseFirstPivot);
+console.log(count);
+count = quicksort(test.slice(), 0, test.length-1, chooseLastPivot);
+console.log(count);
+count = quicksort(test.slice(), 0, test.length-1, chooseMedianPivot);
+console.log(count);
 
-var old = fs.readFileSync('IntegerArray.txt').toString().split("\r\n").slice(0,10000);
-console.log(quicksort(old, 0, chooseFirstPivot).comparisons)
-console.log(quicksort(old, 0, chooseFirstPivot).comparisons)
-
-var a = [3,2,1];
-console.log(a);
-partition(a,0)
-console.log(a)
+count = quicksort(ints.slice(), 0, ints.length-1, chooseFirstPivot);
+console.log(count);
+count = quicksort(ints.slice(), 0, ints.length-1, chooseLastPivot);
+console.log(count);
+count = quicksort(ints.slice(), 0, ints.length-1, chooseMedianPivot);
+console.log(count);
