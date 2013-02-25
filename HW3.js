@@ -66,15 +66,14 @@ var minCut = function(g) {
 				ind = elements.indexOf(parseInt(prop, 10));
 			}
 		}
-		console.log(g);
 		// call minCut again
-		minCut(g);
+		return minCut(g);
 	}
 };
 
-var baseCase = [[1, 2, 2],[2, 1, 1]];
-baseCase = makeHash(baseCase);
-console.log(minCut(baseCase)); // base case
+//var baseCase = [[1, 2, 2],[2, 1, 1]];
+//baseCase = makeHash(baseCase);
+//console.log(minCut(baseCase)); // base case
 
 var randomEdge = function (g) {
 	// generate edge list
@@ -90,5 +89,16 @@ var randomEdge = function (g) {
 	return edgeList[iRandomEdge];
 };
 
-
-minCut(testGraph)
+var G = makeHash(graph);
+// looping to find global minimum
+var N = 200^2 * Math.log(200);
+var globalMin = minCut(G);
+for (var i = 0; i < N; i++) {
+	console.log(i);
+	G = makeHash(graph);
+	var min = minCut(G);
+	if (min < globalMin) {
+		globalMin = min;
+	}
+}
+console.log(globalMin);
