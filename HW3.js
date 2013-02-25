@@ -58,15 +58,18 @@ console.log(minCut(baseCase)); // base case
 var randomEdge = function (g) {
 	// generate edge list
 	var edgeList = [];
-	g.forEach(function (element, index, array){
+	
+	for (var prop in g) {
+		var element = g[prop];
 		element.forEach(function (element, index, array){
-			if (index > 0) {
-				edgeList.push([array[0], element]); // adding to edge list
-			}
+			edgeList.push([prop, element]); // adding to edge list
 		});
-	});
+	}
+	
 	// pick random edge
 	var iRandomEdge = Math.floor(Math.random()*edgeList.length);
 	return edgeList[iRandomEdge];
 };
+
+console.log(randomEdge(baseCase))
 
