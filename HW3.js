@@ -43,11 +43,17 @@ var minCut = function(g) {
 		// pick random edge
 		var randEdge = randomEdge(g);
 		// contract edge
+			// attach second node's connections to first node
+		var combined = g[randEdge[0]].concat(g[randEdge[1]]); 
+		g[randEdge[0]] = combined;
+		
+			// replace second node's adjacencies and replace with first node
+		
 		
 		// remove self loops
 		
 		// call minCut again
-		minCut(g);
+		//minCut(g);
 	}
 };
 
@@ -73,3 +79,6 @@ var randomEdge = function (g) {
 
 console.log(randomEdge(baseCase))
 
+console.log(testGraph)
+minCut(testGraph)
+console.log(testGraph)
