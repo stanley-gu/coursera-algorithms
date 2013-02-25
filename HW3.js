@@ -46,11 +46,25 @@ var minCut = function(g) {
 			// attach second node's connections to first node
 		var combined = g[randEdge[0]].concat(g[randEdge[1]]); 
 		g[randEdge[0]] = combined;
-		
-			// replace second node's adjacencies and replace with first node
-		
-		
+			// delete second node
+		delete g[randEdge[1]];
+			// search second node's adjacencies and replace with first node where second node appears
+		for (var prop in g) {
+			var elements = g[prop];
+			var ind = elements.indexOf(randEdge[1]);
+			if (~ind) {
+				elements[ind] = parseInt(randEdge[0], 10);
+			}
+		}
 		// remove self loops
+		for (var prop in g) {
+			var elements = g[prop];
+			var ind = elements.indexOf(parseInt(prop, 10));
+			while (~ind) {
+				elements.splice(ind, 1);
+				ind = elements.indexOf(parseInt(prop, 10));
+			}
+		}
 		
 		// call minCut again
 		//minCut(g);
