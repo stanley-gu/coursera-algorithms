@@ -38,13 +38,13 @@ var minCut = function(g) {
 	if (Object.keys(g).length === 2) { // two vertices
 		for (var prop in g) {
 			return g[prop].length; // return minimum cut
-		} 
+		}
 	} else { // more than two vertices
 		// pick random edge
 		var randEdge = randomEdge(g);
 		// contract edge
 			// attach second node's connections to first node
-		var combined = g[randEdge[0]].concat(g[randEdge[1]]); 
+		var combined = g[randEdge[0]].concat(g[randEdge[1]]);
 		g[randEdge[0]] = combined;
 			// delete second node
 		delete g[randEdge[1]];
@@ -94,7 +94,6 @@ var G = makeHash(graph);
 var N = 200^2 * Math.log(200);
 var globalMin = minCut(G);
 for (var i = 0; i < N; i++) {
-	console.log(i);
 	G = makeHash(graph);
 	var min = minCut(G);
 	if (min < globalMin) {
