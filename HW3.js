@@ -52,8 +52,9 @@ var minCut = function(g) {
 		for (var prop in g) {
 			var elements = g[prop];
 			var ind = elements.indexOf(randEdge[1]);
-			if (~ind) {
+			while (~ind) {
 				elements[ind] = parseInt(randEdge[0], 10);
+				ind = elements.indexOf(randEdge[1]);
 			}
 		}
 		// remove self loops
@@ -65,9 +66,9 @@ var minCut = function(g) {
 				ind = elements.indexOf(parseInt(prop, 10));
 			}
 		}
-		
+		console.log(g);
 		// call minCut again
-		//minCut(g);
+		minCut(g);
 	}
 };
 
@@ -78,21 +79,16 @@ console.log(minCut(baseCase)); // base case
 var randomEdge = function (g) {
 	// generate edge list
 	var edgeList = [];
-	
 	for (var prop in g) {
 		var element = g[prop];
 		element.forEach(function (element, index, array){
 			edgeList.push([prop, element]); // adding to edge list
 		});
 	}
-	
 	// pick random edge
 	var iRandomEdge = Math.floor(Math.random()*edgeList.length);
 	return edgeList[iRandomEdge];
 };
 
-console.log(randomEdge(baseCase))
 
-console.log(testGraph)
 minCut(testGraph)
-console.log(testGraph)
