@@ -20,13 +20,25 @@ graph.forEach(function (element, index, array){
 	});
 });
 
+// makeHash
+var makeHash = function (g) {
+	var hash = {};
+	g.forEach(function (element, index, array){
+		hash[element[0]] = element.slice(1,element.length);
+	});
+	return hash;
+};
+
 // test graph
 var testGraph = [[1, 2, 3], [2, 1, 3, 4], [3, 1, 2, 4], [4, 2, 3]];
+testGraph = makeHash(testGraph);
 
 // karger's algorithm
 var minCut = function(g) {
-	if (g.length === 2) { // two vertices
-		return g[0].length-1; // return minimum cut
+	if (Object.keys(g).length === 2) { // two vertices
+		for (var prop in g) {
+			return g[prop].length; // return minimum cut
+		} 
 	} else { // more than two vertices
 		// pick random edge
 		var randEdge = randomEdge(g);
@@ -40,6 +52,7 @@ var minCut = function(g) {
 };
 
 var baseCase = [[1, 2, 2],[2, 1, 1]];
+baseCase = makeHash(baseCase);
 console.log(minCut(baseCase)); // base case
 
 var randomEdge = function (g) {
@@ -57,14 +70,3 @@ var randomEdge = function (g) {
 	return edgeList[iRandomEdge];
 };
 
-console.log(randomEdge(baseCase));
-
-var makeHash = function (g) {
-	var hash = {};
-	g.forEach(function (element, index, array){
-		hash[element[0]] = element.slice(1,element.length);
-	});
-	return hash;
-};
-
-console.log(makeHash(baseCase))
