@@ -29,7 +29,7 @@ var minCut = function(g) {
 		return g[0].length-1; // return minimum cut
 	} else { // more than two vertices
 		// pick random edge
-		
+		var randEdge = randomEdge(g);
 		// contract edge
 		
 		// remove self loops
@@ -59,11 +59,12 @@ var randomEdge = function (g) {
 
 console.log(randomEdge(baseCase));
 
-//while more than 2 vertices
-// pick random edge
-// contract edge to single vertex
-// remove self loops
+var makeHash = function (g) {
+	var hash = {};
+	g.forEach(function (element, index, array){
+		hash[element[0]] = element.slice(1,element.length);
+	});
+	return hash;
+};
 
-
-
-// contract
+console.log(makeHash(baseCase))
