@@ -13,97 +13,186 @@ IMPLEMENTATION NOTES: This graph is small enough that the straightforward O(mn) 
 var fs = require('fs');
 
 // load graph
-var graph = fs.readFileSync('kargerMinCut.txt').toString().split('\r\n');
-graph.splice(graph.length-1, 1); //remove extra item
-graph.forEach(function (element, index, array){
+var graph = fs.readFileSync('dijkstraData.txt').toString().split('\r\n');
+graph.splice(graph.length - 1, 1); //remove extra item
+graph.forEach(function(element, index, array) {
 	graph[index] = element.split('\t');
-	graph[index].splice(graph[index].length-1, 1); // remove extra item
+	graph[index].splice(graph[index].length - 1, 1); // remove extra item
 });
-// convert to ints
-graph.forEach(function (element, index, array){
-	element.forEach(function (element, index, array) {
-		array[index] = parseInt(element, 10);
+
+// making hash to contain the graph distances
+var g = {};
+graph.forEach(function(element, index, array) {
+	element.forEach(function(e, i, a) {
+		if (i < 1) { // initialize the containing hash
+			g[e] = {};
+		}
+		else {
+			g[a[0]][e.split(',')[0]] = e.split(',')[1];
+		}
 	});
 });
 
-// makeHash
-var makeHash = function (g) {
-	var hash = {};
-	g.forEach(function (element, index, array){
-		hash[element[0]] = element.slice(1,element.length);
-	});
-	return hash;
-};
 
-// test graph
-var testGraph = [[1, 2, 3], [2, 1, 3, 4], [3, 1, 2, 4], [4, 2, 3]];
-testGraph = makeHash(testGraph);
 
-// karger's algorithm
-var minCut = function(g) {
-	if (Object.keys(g).length === 2) { // two vertices
-		for (var prop in g) {
-			return g[prop].length; // return minimum cut
+// code from: https://github.com/andrewhayward/dijkstra
+
+var Graph = (function(undefined) {
+
+	var extractKeys = function(obj) {
+		var keys = [],
+			key;
+		for (key in obj) {
+			Object.prototype.hasOwnProperty.call(obj, key) && keys.push(key);
 		}
-	} else { // more than two vertices
-		// pick random edge
-		var randEdge = randomEdge(g);
-		// contract edge
-			// attach second node's connections to first node
-		var combined = g[randEdge[0]].concat(g[randEdge[1]]);
-		g[randEdge[0]] = combined;
-			// delete second node
-		delete g[randEdge[1]];
-			// search second node's adjacencies and replace with first node where second node appears
-		for (var prop in g) {
-			var elements = g[prop];
-			var ind = elements.indexOf(randEdge[1]);
-			while (~ind) {
-				elements[ind] = parseInt(randEdge[0], 10);
-				ind = elements.indexOf(randEdge[1]);
+		return keys;
+	}
+
+	var sorter = function(a, b) {
+		return parseFloat(a) - parseFloat(b);
+	}
+
+	var findPaths = function(map, start, end, infinity) {
+		infinity = infinity || Infinity;
+
+		var costs = {},
+		open = {
+			'0': [start]
+		},
+		predecessors = {},
+		keys;
+
+		var addToOpen = function(cost, vertex) {
+			var key = "" + cost;
+			if (!open[key]) open[key] = [];
+			open[key].push(vertex);
+		}
+
+		costs[start] = 0;
+
+		while (open) {
+			if (!(keys = extractKeys(open)).length) break;
+
+			keys.sort(sorter);
+
+			var key = keys[0],
+				bucket = open[key],
+				node = bucket.shift(),
+				currentCost = parseFloat(key),
+				adjacentNodes = map[node] || {};
+
+			if (!bucket.length) delete open[key];
+
+			for (var vertex in adjacentNodes) {
+				if (Object.prototype.hasOwnProperty.call(adjacentNodes, vertex)) {
+					var cost = adjacentNodes[vertex],
+						totalCost = cost + currentCost,
+						vertexCost = costs[vertex];
+
+					if ((vertexCost === undefined) || (vertexCost > totalCost)) {
+						costs[vertex] = totalCost;
+						addToOpen(totalCost, vertex);
+						predecessors[vertex] = node;
+					}
+				}
 			}
 		}
-		// remove self loops
-		for (var prop in g) {
-			var elements = g[prop];
-			var ind = elements.indexOf(parseInt(prop, 10));
-			while (~ind) {
-				elements.splice(ind, 1);
-				ind = elements.indexOf(parseInt(prop, 10));
-			}
+
+		if (costs[end] === undefined) {
+			return null;
 		}
-		// call minCut again
-		return minCut(g);
-	}
-};
+		else {
+			return predecessors;
+		}
 
-//var baseCase = [[1, 2, 2],[2, 1, 1]];
-//baseCase = makeHash(baseCase);
-//console.log(minCut(baseCase)); // base case
-
-var randomEdge = function (g) {
-	// generate edge list
-	var edgeList = [];
-	for (var prop in g) {
-		var element = g[prop];
-		element.forEach(function (element, index, array){
-			edgeList.push([prop, element]); // adding to edge list
-		});
 	}
-	// pick random edge
-	var iRandomEdge = Math.floor(Math.random()*edgeList.length);
-	return edgeList[iRandomEdge];
-};
 
-var G = makeHash(graph);
-// looping to find global minimum
-var N = 200^2 * Math.log(200);
-var globalMin = minCut(G);
-for (var i = 0; i < N; i++) {
-	G = makeHash(graph);
-	var min = minCut(G);
-	if (min < globalMin) {
-		globalMin = min;
+	var extractShortest = function(predecessors, end) {
+		var nodes = [],
+			u = end;
+
+		while (u) {
+			nodes.push(u);
+			predecessor = predecessors[u];
+			u = predecessors[u];
+		}
+
+		nodes.reverse();
+		return nodes;
 	}
-}
-console.log(globalMin);
+
+	var findShortestPath = function(map, nodes) {
+		var start = nodes.shift(),
+			end,
+			predecessors,
+			path = [],
+			shortest;
+
+		while (nodes.length) {
+			end = nodes.shift();
+			predecessors = findPaths(map, start, end);
+
+			if (predecessors) {
+				shortest = extractShortest(predecessors, end);
+				if (nodes.length) {
+					path.push.apply(path, shortest.slice(0, - 1));
+				}
+				else {
+					return path.concat(shortest);
+				}
+			}
+			else {
+				return null;
+			}
+
+			start = end;
+		}
+	}
+
+	var toArray = function(list, offset) {
+		try {
+			return Array.prototype.slice.call(list, offset);
+		}
+		catch (e) {
+			var a = [];
+			for (var i = offset || 0, l = list.length; i < l; ++i) {
+				a.push(list[i]);
+			}
+			return a;
+		}
+	}
+
+	var Graph = function(map) {
+		this.map = map;
+	}
+
+	Graph.prototype.findShortestPath = function(start, end) {
+		if (Object.prototype.toString.call(start) === '[object Array]') {
+			return findShortestPath(this.map, start);
+		}
+		else if (arguments.length === 2) {
+			return findShortestPath(this.map, [start, end]);
+		}
+		else {
+			return findShortestPath(this.map, toArray(arguments));
+		}
+	}
+
+	Graph.findShortestPath = function(map, start, end) {
+		if (Object.prototype.toString.call(start) === '[object Array]') {
+			return findShortestPath(map, start);
+		}
+		else if (arguments.length === 3) {
+			return findShortestPath(map, [start, end]);
+		}
+		else {
+			return findShortestPath(map, toArray(arguments, 1));
+		}
+	}
+
+	return Graph;
+
+})();
+
+var G1 = new Graph(g);
+console.log(G1.findShortestPath('1', '2'));
