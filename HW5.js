@@ -34,165 +34,40 @@ graph.forEach(function(element, index, array) {
 });
 
 
-
-// code from: https://github.com/andrewhayward/dijkstra
-
-var Graph = (function(undefined) {
-
-	var extractKeys = function(obj) {
-		var keys = [],
-			key;
-		for (key in obj) {
-			Object.prototype.hasOwnProperty.call(obj, key) && keys.push(key);
-		}
-		return keys;
-	}
-
-	var sorter = function(a, b) {
-		return parseFloat(a) - parseFloat(b);
-	}
-
-	var findPaths = function(map, start, end, infinity) {
-		infinity = infinity || Infinity;
-
-		var costs = {},
-		open = {
-			'0': [start]
-		},
-		predecessors = {},
-		keys;
-
-		var addToOpen = function(cost, vertex) {
-			var key = "" + cost;
-			if (!open[key]) open[key] = [];
-			open[key].push(vertex);
-		}
-
-		costs[start] = 0;
-
-		while (open) {
-			if (!(keys = extractKeys(open)).length) break;
-
-			keys.sort(sorter);
-
-			var key = keys[0],
-				bucket = open[key],
-				node = bucket.shift(),
-				currentCost = parseFloat(key),
-				adjacentNodes = map[node] || {};
-
-			if (!bucket.length) delete open[key];
-
-			for (var vertex in adjacentNodes) {
-				if (Object.prototype.hasOwnProperty.call(adjacentNodes, vertex)) {
-					var cost = adjacentNodes[vertex],
-						totalCost = cost + currentCost,
-						vertexCost = costs[vertex];
-
-					if ((vertexCost === undefined) || (vertexCost > totalCost)) {
-						costs[vertex] = totalCost;
-						addToOpen(totalCost, vertex);
-						predecessors[vertex] = node;
-					}
+var dijkstras = function(graph, a, b) {
+	// initialize
+	var X = [a]; // vertices explored so far
+	var A = {}; // computed shortest path distances/scores
+	A[a] = 0; // source has distance of 0
+	var B = [a]; // computed shortest path
+	
+	console.log(graph)
+	// main loop
+	while (X.indexOf(b) === -1) { // while destination not in explored nodes
+		for (var i = 0; i < X.length; i++) { // for all explored nodes
+			console.log(X[i])
+			var edges = Object.keys(graph[X[i]]);
+			var unexploredVertex = [];
+			var vertexScore = []; 
+			for (var j = 0; j < edges.length; j++) { // for all edges
+				if (X.indexOf(edges[j]) === -1) { // is unexplored
+					unexploredVertex.push(edges[j]);
+					vertexScore.push(A[X[i]] + graph[X[i]][edges[j]]);
 				}
 			}
-		}
-
-		if (costs[end] === undefined) {
-			return null;
-		}
-		else {
-			return predecessors;
-		}
-
-	}
-
-	var extractShortest = function(predecessors, end) {
-		var nodes = [],
-			u = end;
-
-		while (u) {
-			nodes.push(u);
-			predecessor = predecessors[u];
-			u = predecessors[u];
-		}
-
-		nodes.reverse();
-		return nodes;
-	}
-
-	var findShortestPath = function(map, nodes) {
-		var start = nodes.shift(),
-			end,
-			predecessors,
-			path = [],
-			shortest;
-
-		while (nodes.length) {
-			end = nodes.shift();
-			predecessors = findPaths(map, start, end);
-
-			if (predecessors) {
-				shortest = extractShortest(predecessors, end);
-				if (nodes.length) {
-					path.push.apply(path, shortest.slice(0, - 1));
-				}
-				else {
-					return path.concat(shortest);
-				}
-			}
-			else {
-				return null;
-			}
-
-			start = end;
+			// pick shortest path
+			var minScore = Math.min.apply(null, vertexScore);
+			var ind = vertexScore.indexOf(minScore);
+			X.push(unexploredVertex[ind]); // add to explored
+			A[unexploredVertex[ind]] = minScore; // add score
+			B.push(unexploredVertex[ind]); // add path
 		}
 	}
+	
+	return A[b];
+};
 
-	var toArray = function(list, offset) {
-		try {
-			return Array.prototype.slice.call(list, offset);
-		}
-		catch (e) {
-			var a = [];
-			for (var i = offset || 0, l = list.length; i < l; ++i) {
-				a.push(list[i]);
-			}
-			return a;
-		}
-	}
+var map = {a:{b:3,c:1},b:{a:2,c:1},c:{a:4,b:1}}; // test map
 
-	var Graph = function(map) {
-		this.map = map;
-	}
-
-	Graph.prototype.findShortestPath = function(start, end) {
-		if (Object.prototype.toString.call(start) === '[object Array]') {
-			return findShortestPath(this.map, start);
-		}
-		else if (arguments.length === 2) {
-			return findShortestPath(this.map, [start, end]);
-		}
-		else {
-			return findShortestPath(this.map, toArray(arguments));
-		}
-	}
-
-	Graph.findShortestPath = function(map, start, end) {
-		if (Object.prototype.toString.call(start) === '[object Array]') {
-			return findShortestPath(map, start);
-		}
-		else if (arguments.length === 3) {
-			return findShortestPath(map, [start, end]);
-		}
-		else {
-			return findShortestPath(map, toArray(arguments, 1));
-		}
-	}
-
-	return Graph;
-
-})();
-
-var G1 = new Graph(g);
-console.log(G1.findShortestPath('1', '2'));
+console.log(dijkstras(map, 'a', 'c')); // should return 1
+console.log(dijkstras(map, 'a', 'b')); // should return 2
