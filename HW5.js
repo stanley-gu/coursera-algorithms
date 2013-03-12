@@ -45,30 +45,23 @@ var dijkstras = function(G, a, b) {
 	while (X.indexOf(b) === -1) { // while destination not in explored nodes
 		var edges = [];
 		var scores = [];
-		var unexploredVertex = [];
-		var vertexScore = [];
 		for (var i = 0; i < X.length; i++) { // for all explored nodes
-			debugger;
-			edges = edges.concat(Object.keys(G[X[i]]));
-			Object.keys(G[X[i]]).forEach(function(element, index, array) {
+			var unexplored = Object.keys(G[X[i]]).filter(function(element, index, array) {
+				return (X.indexOf(element) === -1);
+			});
+
+			edges = edges.concat(unexplored);
+			unexplored.forEach(function(element, index, array) {
 				scores.push(A[X[i]] + G[X[i]][element]);
 			})
 		};
-		for (var j = 0; j < edges.length; j++) { // for all edges
-			if (X.indexOf(edges[j]) === -1) { // is unexplored
-				debugger;
-				unexploredVertex.push(edges[j]); // added vertex name
-				vertexScore.push(scores[j]); //add vertex score
-			}
-		}
 		// pick shortest path
-		if (vertexScore.length > 0) {
-			var minScore = Math.min.apply(null, vertexScore);
-			var ind = vertexScore.indexOf(minScore);
-			debugger;
-			X.push(unexploredVertex[ind]); // add to explored
-			A[unexploredVertex[ind]] = minScore; // add score
-			B.push(unexploredVertex[ind]); // add path
+		if (scores.length > 0) {
+			var minScore = Math.min.apply(null, scores);
+			var ind = scores.indexOf(minScore);
+			X.push(edges[ind]); // add to explored
+			A[edges[ind]] = minScore; // add score
+			B.push(edges[ind]); // add path
 		}
 	}
 
