@@ -43,13 +43,14 @@ var countSums = function(a, b, hash) { // a and b are range of t's
 		for (var x in hash) {
 			var numX = hash[x];
 			var numY = hash[t-hash[x]];
+			debugger;
 			sums += Math.min(numX, numY);
 		}
 	}
 	return sums;
 };
 
-console.log(countSums(2500, 4000, intHash));
+console.log(countSums(2500, 2501, intHash));
 
 /*
 Question 2
@@ -173,4 +174,7 @@ BinaryHeap.prototype = {
     }
   }
 };
+
+var minHeap = new BinaryHeap(function(x){return x;});
+var maxHeap = new BinaryHeap(function(x){return -x;});
 
