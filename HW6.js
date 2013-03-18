@@ -31,10 +31,12 @@ ints.forEach(function(element, index, array) {
 var intHash = {};
 ints.forEach(function(element, index, array) {
 	debugger;
-	if (intHash[element] === undefined) { // element not in array
-		intHash[element] = 1;
-	} else {
-		intHash[element] += 1;
+	if (element < 4001) {
+		if (intHash[element] === undefined) { // element not in array
+			intHash[element] = 1;
+		} else {
+			intHash[element] += 1;
+		}
 	}
 });
 
@@ -45,6 +47,7 @@ var countSums = function(a, b, hash) { // a and b are range of t's
 				var numX = hash[x];
 				var numY = hash[t - hash[x]];
 				if (numY > 0) {
+					debugger;
 					sums += Math.min(numX, numY);
 				}
 			}
@@ -52,7 +55,7 @@ var countSums = function(a, b, hash) { // a and b are range of t's
 		return sums;
 	};
 
-console.log(countSums(2500, 2501, intHash));
+console.log(countSums(2500, 4000, intHash));
 
 /*
 Question 2
@@ -63,7 +66,7 @@ The goal of this problem is to implement the "Median Maintenance" algorithm (cov
 In the box below you should type the sum of these 10000 medians, modulo 10000 (i.e., only the last 4 digits). That is, you should compute (m1+m2+m3+⋯+m10000)mod10000.
 
 OPTIONAL EXERCISE: Compare the performance achieved by heap-based and search-tree-based implementations of the algorithm.
-*/
+
 function BinaryHeap(scoreFunction) {
 	this.content = [];
 	this.scoreFunction = scoreFunction;
@@ -182,3 +185,4 @@ var minHeap = new BinaryHeap(function(x) {
 var maxHeap = new BinaryHeap(function(x) {
 	return -x;
 });
+*/
