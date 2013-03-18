@@ -180,10 +180,36 @@ BinaryHeap.prototype = {
 	}
 };
 
-var minHeap = new BinaryHeap(function(x) {
+var topHalf = new BinaryHeap(function(x) {
 	return x;
 });
-var maxHeap = new BinaryHeap(function(x) {
+var bottomHalf = new BinaryHeap(function(x) {
 	return -x;
 });
+
+var medians = [];
+// load median array
+var arr = fs.readFileSync('Median.txt').toString().split('\r\n');
+arr.splice(ints.length - 1, 1); //remove extra item
+arr.forEach(function(element, index, array) {
+	arr[index] = parseInt(element, 10);
+	if (index == 1) {
+		// initialize heaps
+		if (arr[0] < arr[1]) {
+			topHalf.push(arr[1]);
+			bottomHalf.push(arr[0]);
+		} else {
+			bottomHalf.push(arr[1]);
+			topHalf.push(arr[0]);
+		}
+		medians.push(arr[0]);
+		medians.push((arr[0] + arr[1])/2);
+	} else if (index > 1) {
+		// for the rest of the median values
+
+	}
+});
+
+console.log(medians)
+
 
