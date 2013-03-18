@@ -26,6 +26,31 @@ ints.forEach(function(element, index, array) {
 	ints[index] = parseInt(element, 10);
 });
 
+
+// generate hash table
+var intHash = {};
+ints.forEach(function(element, index, array) {
+	if (intHash[element] === null) { // element not in array
+		intHash[element] = 1;
+	} else {
+		intHash[element] += 1;
+	}
+});
+
+var countSums = function(a, b, hash) { // a and b are range of t's
+	var sums = 0;
+	for (var t = a; t <= b; t++) {
+		for (var x in hash) {
+			var numX = hash[x];
+			var numY = hash[t-hash[x]];
+			sums += Math.min(numX, numY);
+		}
+	}
+	return sums;
+};
+
+console.log(countSums(2500, 4000, intHash));
+
 /*
 Question 2
 Download the text file here.
