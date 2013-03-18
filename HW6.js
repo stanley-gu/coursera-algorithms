@@ -66,6 +66,7 @@ The goal of this problem is to implement the "Median Maintenance" algorithm (cov
 In the box below you should type the sum of these 10000 medians, modulo 10000 (i.e., only the last 4 digits). That is, you should compute (m1+m2+m3+⋯+m10000)mod10000.
 
 OPTIONAL EXERCISE: Compare the performance achieved by heap-based and search-tree-based implementations of the algorithm.
+*/
 
 function BinaryHeap(scoreFunction) {
 	this.content = [];
@@ -185,4 +186,4 @@ var minHeap = new BinaryHeap(function(x) {
 var maxHeap = new BinaryHeap(function(x) {
 	return -x;
 });
-*/
+
