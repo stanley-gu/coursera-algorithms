@@ -30,25 +30,25 @@ ints.forEach(function(element, index, array) {
 // generate hash table
 var intHash = {};
 ints.forEach(function(element, index, array) {
-	debugger;
 	if (element < 4001) {
 		if (intHash[element] === undefined) { // element not in array
 			intHash[element] = 1;
-		} else {
-			intHash[element] += 1;
 		}
 	}
 });
+
 
 var countSums = function(a, b, hash) { // a and b are range of t's
 		var sums = 0;
 		for (var t = a; t <= b; t++) {
 			for (var x in hash) {
-				var numX = hash[x];
-				var numY = hash[t - hash[x]];
-				if (numY > 0) {
+				var y = t - x;
+				var numY = hash[y];
+				debugger;
+				if ((numY > 0) && (y != x)) {
 					debugger;
-					sums += Math.min(numX, numY);
+					sums += 1;
+					break;
 				}
 			}
 		}
